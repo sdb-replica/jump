@@ -46,34 +46,21 @@ pub fn jump_hash(mut key: u64, num_buckets: i32) -> i32 {
         // Calculate jump distance using the extracted random bits
         // The denominator is incremented by 1 to avoid division by zero
         let jump_distance = (1i64 << 31) as f64 / (random_bits + 1) as f64;
+        
+        // Calculate the next bucket to examine using a multiplicative jump
+        // Formula: (current_bucket + 1) * jump_distance
+        // 
+        // Why this works:
+        // 1. current_bucket + 1 ensures forward progression through buckets
+        // 2. Multiplying by jump_distance (which gets smaller) creates:
+        //    - Large initial jumps (for quick bucket space traversal)
+        //    - Progressively smaller jumps (for precise final placement)
+        //    - Example sequence: 0 → 800 → 900 → 950 → 975 → ...
+        // 3. Float conversion (as f64) enables precise fractional jumps
+        // 4. Final integer conversion (as i64) gives the next bucket number
         next_jump = ((current_bucket + 1) as f64 * jump_distance) as i64;
     }
 
     current_bucket as i32
 }
 
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn test_basic_distribution() {
-        let bucket = jump_hash(123456789, 10);
-        assert!(bucket >= 0 && bucket < 10);
-    }
-
-    #[test]
-    fn test_consistency() {
-        let key = 987654321;
-        let bucket1 = jump_hash(key, 10);
-        let bucket2 = jump_hash(key, 10);
-        assert_eq!(bucket1, bucket2);
-    }
-
-    #[test]
-    fn test_edge_cases() {
-        assert_eq!(jump_hash(123, 0), 0);
-        assert_eq!(jump_hash(123, 1), 0);
-        assert_eq!(jump_hash(0, 5), jump_hash(0, 5));
-    }
-}

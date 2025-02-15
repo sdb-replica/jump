@@ -75,4 +75,46 @@ mod tests {
         println!("Moved {}% of keys when increasing buckets from {} to {}", 
                 move_percentage, initial_buckets, new_buckets);
     }
+
+    #[test]
+    fn test_iteration_count() {
+        let test_cases = [
+            (10, "10 buckets"),
+            (100, "100 buckets"),
+            (1_000, "1K buckets"),
+            (10_000, "10K buckets"),
+            (100_000, "100K buckets"),
+            (1_000_000, "1M buckets"),
+        ];
+
+        for (num_buckets, label) in test_cases {
+            let mut total_iterations = 0;
+            let num_keys = 10_000; // Test with 10K keys for each bucket size
+
+            for key in 0..num_keys {
+                let mut iterations = 0;
+                let mut k: i64 = key;
+                let mut b: i64 = -1;
+                let mut j: i64 = 0;
+
+                while j < num_buckets as i64 {
+                    iterations += 1;
+                    b = j;
+                    k = k.wrapping_mul(2862933555777941757).wrapping_add(1);
+                    let random_bits = k >> 33;
+                    j = ((b + 1) as f64 * ((1i64 << 31) as f64 / (random_bits + 1) as f64)) as i64;
+                }
+                total_iterations += iterations;
+            }
+
+            let avg_iterations = total_iterations as f64 / num_keys as f64;
+            println!("{}: Average iterations = {:.2}", label, avg_iterations);
+            
+            // The number of iterations should be roughly logarithmic
+            // ln(num_buckets) + O(1)
+            let expected_iterations = (num_buckets as f64).ln() + 1.0;
+            assert!(avg_iterations < expected_iterations * 2.0, 
+                "Too many iterations for {}", label);
+        }
+    }
 }
