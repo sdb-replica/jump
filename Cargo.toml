@@ -1,7 +1,13 @@
 [package]
-name = "jump-hash"
+name = "jump"
 version = "0.1.0"
 edition = "2021"
+authors = ["Sai Budaraju <saidb.replica@gmail.com>"]
+description = "Implementation of Jump Consistent Hash algorithm"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/saidb-replica/jump"
+keywords = ["hashing", "consistent-hashing", "distribution"]
+categories = ["algorithms", "data-structures"]
 
 [dependencies]
 

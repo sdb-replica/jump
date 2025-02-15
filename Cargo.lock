@@ -297,7 +297,7 @@ dependencies = [
 ]
 
 [[package]]
-name = "jump-hash"
+name = "jump"
 version = "0.1.0"
 dependencies = [
  "criterion",
